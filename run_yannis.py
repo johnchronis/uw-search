@@ -10,7 +10,7 @@ call(['make', 'release'])
 run_param = ['algorithm', 'n', 'param', 'distribution', 'record', 'n_thds']
 
 with open("/mnt/tmp/log_file", "w") as log_file:
-    subprocess.run(["./release","i-seq.tsv"], stdout=log_file)
+    subprocess.run(["./release","run.tsv"], stdout=log_file)
 
 df = read_csv("/mnt/tmp/log_file", sep='\t')
 

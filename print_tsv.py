@@ -32,8 +32,8 @@ for size in sizes:
 
 
 
-call(['rm', '-rf','i-seq.tsv'])
-with open("i-seq.tsv", "w") as file:
+call(['rm', '-rf','run.tsv'])
+with open("run.tsv", "w") as file:
   file.write("n\tdistribution\tparam\talgorithm\trecord\tthread\n")
   for line in lines:
     file.write(line+'\n')
