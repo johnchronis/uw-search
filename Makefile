@@ -11,29 +11,29 @@ SOURCES=search.cc
 ##### Run Targets ######
 run : release
 run :
-        ./release run.tsv
+		./release run.tsv
 
 gdb : debug
 gdb :
-        gdb --args ./debug run.tsv
+		gdb --args ./debug run.tsv
 
 perf : CXXFLAGS += -O3 -DNDEBUG -DINFINITE_REPEAT
 perf :
-        $(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
-        perf record -F99 -g ./perf run.tsv
+		$(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
+		perf record -F99 -g ./perf run.tsv
 
 clean:
-        rm -f ./release ./debug ./dump
+		rm -f ./release ./debug ./dump
 
 ####### Build Targets #########
 
 release : CXXFLAGS += -O3 -DNDEBUG
 release: $(SOURCES) $(HEADERS)
-        $(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
+		$(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
 
 debug : CXXFLAGS += -O0
 debug: $(SOURCES) $(HEADERS)
-        $(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
+		$(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
 
 dump : dump.cc benchmark.h
-        $(CXX) $(CXXFLAGS) dump.cc -o $@ $(LDFLAGS)
+		$(CXX) $(CXXFLAGS) dump.cc -o $@ $(LDFLAGS)
