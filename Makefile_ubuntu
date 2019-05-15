@@ -1,18 +1,4 @@
-N_RUNS=10
-ifdef NSORT
-	DEFINES += -DNSORT
-endif
-ifdef N_RUNS
-	DEFINES += -DN_RUNS=$(N_RUNS)
-endif
-ifdef N_SAMPLES
-	DEFINES += -DN_SAMPLES=$(N_SAMPLES)
-endif
-ifdef SUBSET_SIZE
-	DEFINES += -DSUBSET_SIZE=$(SUBSET_SIZE)
-endif
-
-CXX=~/clang5/bin/clang++ 
+CXX=~/clang5/bin/clang++
 CHOME=~/clang5
 CXXFLAGS=-fopenmp -ffast-math -Wall -I$(CHOME)/include -L$(CHOME)/lib -std=c++17 -stdlib=libc++ -fno-omit-frame-pointer -ggdb -march=native $(DEFINES) -I$(HOME)/iaca/include
 LIB=-I$(CHOME)/include -L$(CHOME)/lib  -I$(HOME)/iaca/include
