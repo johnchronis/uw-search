@@ -1,0 +1,5 @@
+n	distribution	param	algorithm	record	thread
+10000	fal	1.05	b-lin	8	1
+10000	fal	1.05	b-lin	128	1
+10000	fal	1.05	i-hyp-64	8	1
+10000	fal	1.05	i-hyp-64	128	1

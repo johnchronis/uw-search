@@ -341,8 +341,8 @@ InputBase::InputMap InputBase::load(std::vector<Run> runs) {
   for (auto r : runs) {
     auto input_param = r.input_param;
     if (inputs.count(input_param) == 0) {
-      std::cerr << "load " << input_param.n << ' ' << input_param.distribution
-                << ' ' << input_param.param << '\n';
+      std::cerr << "Loading Dataset size:" << input_param.n << ", distribution: " << input_param.distribution
+                << ", distribution parameter: " << input_param.param << '\n';
       auto distribution_param = split(input_param.param);
       inputs.emplace((InputParam::Tuple)input_param,
                      [=]() {

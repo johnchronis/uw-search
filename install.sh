@@ -1,14 +1,6 @@
 clang_ling=http://releases.llvm.org/5.0.0/clang+llvm-5.0.0-linux-x86_64-ubuntu16.04.tar.xz
-
-unameOut="$(uname -s)"
-case "${unameOut}" in
-    Linux*)
-        sudo apt-get update
-        sudo apt install -y libomp-dev libc++-dev
-    ;;
-    Darwin*)
-        clang_ling=http://releases.llvm.org/5.0.0/clang%2bllvm-5.0.0-x86_64-apple-darwin.tar.xz;;
-esac
+sudo apt-get update
+sudo apt install -y libomp-dev libc++-dev python3 python3-pandas
 
 echo $clang_ling
 wget $(echo $clang_ling)

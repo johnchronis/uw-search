@@ -9,26 +9,24 @@ SOURCES=src/search.cc
 .PHONY: run gdb clean perf
 
 ##### Run Targets ######
-run : release
-run :
-		./release run.tsv
+run : searchbench
 
 gdb : debug
 gdb :
-		gdb --args ./debug run.tsv
+		gdb --args ./debug runs.tsv
 
 perf : CXXFLAGS += -O3 -DNDEBUG -DINFINITE_REPEAT
 perf :
 		$(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
-		perf record -F99 -g ./perf run.tsv
+		perf record -F99 -g ./perf runs.tsv
 
 clean:
-		rm -f ./release ./debug ./dump
+		rm -f ./searchbench ./debug ./dump
 
 ####### Build Targets #########
 
-release : CXXFLAGS += -O3 -DNDEBUG
-release: $(SOURCES) $(HEADERS)
+searchbench: CXXFLAGS += -O3 -DNDEBUG
+searchbench: $(SOURCES) $(HEADERS)
 		$(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
 
 debug : CXXFLAGS += -O0

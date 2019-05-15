@@ -1,4 +1,5 @@
 clang5
+outfile
 
 # Prerequisites
 *.d
