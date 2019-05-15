@@ -1,11 +1,5 @@
-# uw-search
+# Compilation
++ The installation and compilation script works on Ubuntu 16.04 and 18.04 systems
++ The code is compiled using clang5
 
-## Mac installation
-Linux 16.10 run the install_ubuntu.sh script
  
-## Mac installation
--https://embeddedartistry.com/blog/2017/2/20/installing-clangllvm-on-osx
-
--uncomment the following lines in the Makefile:
-CXX= /usr/local/opt/llvm/bin/clang++
-CHOME= /usr/local/opt/llvm/
