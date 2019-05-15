@@ -32,9 +32,8 @@ std::cout  << "Run\tDatasetSize\tDistribution\tParameter\t#threads\tSearchAlgori
     RunTuple new_param{ run.input_param, run.name, run.n_thds };
     auto t1 = std::chrono::steady_clock::now();
     if (new_param != old_param) {
-      std::cerr << "\nSearching: " << n << ' ' << distribution << ' ' << param << ' '
-                << record_bytes << ' ' << run.name << ' ' << run.n_thds << '\n';
-//      std::cerr << "Run\tDatasetSize\tDistribution\tParameter\t#threads\tSearchAlgorithm\tRecordSizeBytes\tTimeNS\n";
+      std::cerr << '\n' << n << ' ' << distribution << ' ' << param << ' '
+                << record_bytes << ' ' << run.name << ' ' << run.n_thds;
       old_param = new_param;
       t0 = t1;
     } else if (std::chrono::duration<double, std::milli>(t1 - t0).count() >
