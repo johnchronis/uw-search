@@ -21,8 +21,10 @@
 #define IACA_END
 #endif
 
+// The base for all interpolation based search algorithms.
+// Implements the interpolation functions used in the search algorithms.
 template <int record_bytes> class IBase {
-public:
+ public:
   using Vector = PaddedVector<record_bytes>;
   using Index = int64_t;
 
@@ -34,7 +36,7 @@ public:
     Float(const Vector &a)
         : A(a), slope(FixedPoint::Gen(A.size() - 1) / (A.back() - A[0])),
           f_aL(A[0]), f_width_range((double)((uint64_t)A.size() - 1) /
-                                    (double)(A.back() - A[0])) {}
+            (double)(A.back() - A[0])) {}
 
     const Vector &A;
     const FixedPoint slope;
@@ -43,7 +45,7 @@ public:
 
     Index operator()(const Key x, const Index left, const Index right) {
       return left + ((double)x - (double)(A[left])) /
-                        (double)(A[right] - A[left]) * (double)(right - left);
+          (double)(A[right] - A[left]) * (double)(right - left);
     }
 
     Index operator()(const Key x, const Index mid) {
@@ -62,8 +64,8 @@ public:
     Hyp3(const Vector &a)
         : A(a), d((uint64_t)A.size() >> 1), y_1(A[d]), diff_y_01(A[0] - y_1),
           a_0(diff_y_01 == (y_1 - A.back())
-                  ? 0.99999999999999
-                  : diff_y_01 / (double)(y_1 - A.back())),
+              ? 0.99999999999999
+              : diff_y_01 / (double)(y_1 - A.back())),
           diff_scale(A[0] - a_0 * A.back()), d_a((1.0 + a_0) * d) {}
     const Vector &A;
     const Index d;
@@ -80,9 +82,9 @@ public:
     Index operator()(const Key y, const Index x_0, const Index x_1,
                      const Index x_2) const {
       double y_0 = A[x_0] - y, y_1 = A[x_1] - y, y_2 = A[x_2] - y,
-             error = y_1 * (x_1 - x_2) * (x_1 - x_0) * (y_2 - y_0) /
-                     (y_2 * (x_1 - x_2) * (y_0 - y_1) +
-                      y_0 * (x_1 - x_0) * (y_1 - y_2));
+          error = y_1 * (x_1 - x_2) * (x_1 - x_0) * (y_2 - y_0) /
+          (y_2 * (x_1 - x_2) * (y_0 - y_1) +
+              y_0 * (x_1 - x_0) * (y_1 - y_2));
       return x_1 + (Index)error;
     }
 
@@ -107,15 +109,16 @@ public:
     Index operator()(const Key x) { return (x - A[0]) / i_range_width; }
   };
 
-protected:
+ protected:
   const Vector &A;
 
   IBase(const Vector &v) : A(v) {}
 };
 
+// TIP
 template <int record_bytes, int guard_off,
-          class Interpolate = typename IBase<record_bytes>::template Hyp3<> >
-class tip : public IBase<record_bytes> {
+    class Interpolate = typename IBase<record_bytes>::template Hyp3<> >
+class i_hyp : public IBase<record_bytes> {
   using Super = IBase<record_bytes>;
   using Vector = typename Super::Vector;
   using typename Super::Index;
@@ -134,12 +137,12 @@ class tip : public IBase<record_bytes> {
     }
   }
 
-public:
-  tip(const Vector &v) : Super(v), interpolate(A) { assert(A.size() >= 1); }
+ public:
+  i_hyp(const Vector &v) : Super(v), interpolate(A) { assert(A.size() >= 1); }
 
   __attribute__((always_inline)) Key operator()(const Key x) {
     Index left = 0, right = A.size() - 1, next_1 = A.size() >> 1,
-          next_2 = interpolate(x);
+        next_2 = interpolate(x);
     for (int i = 1; nIter < 0 || i < nIter; i++) {
       if (next_2 - next_1 <= guard_off && next_2 - next_1 >= -guard_off)
         return linear_search(x, next_2);
@@ -148,7 +151,7 @@ public:
       assert(next_2 >= left);
       assert(next_2 <= right);
       assert(next_1 != next_2);
-      if (A[next_1] != A[next_2]) {	
+      if (A[next_1] != A[next_2]) {
         if (next_1 < next_2) {
           assert(A[next_1] <= x); // f(x) <= f(x') ==> x <= x'
           left = next_1;
@@ -165,7 +168,7 @@ public:
           IACA_END
           return r;
         }
-      }	
+      }
       next_1 = next_2;
 
       assert(left < right);
@@ -183,10 +186,11 @@ public:
   }
 };
 
+// IS
 template <int record_bytes,
-          class Interpolate = typename IBase<record_bytes>::template Float<>,
-          int nIter = IBase<record_bytes>::Recurse, int guard_off = 16,
-          bool min_width = false>
+    class Interpolate = typename IBase<record_bytes>::template Float<>,
+    int nIter = IBase<record_bytes>::Recurse, int guard_off = 16,
+    bool min_width = false>
 class Interpolation : public IBase<record_bytes> {
   using Super = IBase<record_bytes>;
   using Vector = typename Super::Vector;
@@ -196,7 +200,7 @@ class Interpolation : public IBase<record_bytes> {
 
   Interpolate interpolate;
 
-public:
+ public:
   Interpolation(const Vector &v) : Super(v), interpolate(A) {}
 
   __attribute__((always_inline)) Key operator()(const Key x) {
@@ -244,9 +248,10 @@ public:
   }
 };
 
+// SIP
 template <int record_bytes, int nIter = IBase<record_bytes>::Recurse,
-          class Interpolate = typename IBase<record_bytes>::template Float<>,
-          int guard_off = 8>
+    class Interpolate = typename IBase<record_bytes>::template Float<>,
+    int guard_off = 8>
 class InterpolationSlope : public IBase<record_bytes> {
   using Super = IBase<record_bytes>;
   using Vector = typename Super::Vector;
@@ -257,7 +262,7 @@ class InterpolationSlope : public IBase<record_bytes> {
 
   Interpolate interpolate;
 
-public:
+ public:
   InterpolationSlope(const Vector &v) : Super(v), interpolate(A) {}
 
   // TODO replace with flatten?
@@ -310,38 +315,37 @@ public:
 };
 
 /*
- * is : Vanilla Interpolation Search
- * sip : SIP
- * is_seq : Interpolation-Sequential
- * sip_no_reuse: Don't re-use slope
- * sip_no_guard : SIP with no guard (guard = 0)
- * sip_fp : use FP division
- * sip_idiv : use int division
+ * i_naive : Naive-IS
+ * i_opt : Optimized-IS
+ * i_seq : Interpolation-Sequential
+ * i_recompute : Don't re-use slope
+ * i_no_guard : guard = 0
+ * i_fp : use FP division
+ * i_idiv : use int division
  */
 template <int record_bytes>
-using is =
-    Interpolation<record_bytes,
-                  typename IBase<record_bytes>::template Float<false>,
-                  IBase<record_bytes>::Recurse, -1>;
+using i_naive =
+Interpolation<record_bytes,
+              typename IBase<record_bytes>::template Float<false>,
+              IBase<record_bytes>::Recurse, -1>;
 template <int RECORD, int GUARD>
-using sip =
-    InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
-                       typename IBase<RECORD>::template Float<>, GUARD>;
-template <int RECORD> using is_seq =
-    InterpolationSlope<RECORD, 1>;
+using i_opt =
+InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+                   typename IBase<RECORD>::template Float<>, GUARD>;
+template <int RECORD> using i_seq = InterpolationSlope<RECORD, 1>;
 template <int RECORD, int GUARD>
-using sip_no_reuse =
-    Interpolation<RECORD, typename IBase<RECORD>::template Float<>,
-                  IBase<RECORD>::Recurse, GUARD>;
+using i_no_reuse =
+Interpolation<RECORD, typename IBase<RECORD>::template Float<>,
+              IBase<RECORD>::Recurse, GUARD>;
 template <int RECORD>
-using sip_no_guard =
-    InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
-                       typename IBase<RECORD>::template Float<>, -1>;
+using i_no_guard =
+InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+                   typename IBase<RECORD>::template Float<>, -1>;
 template <int RECORD>
-using sip_fp = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+using i_fp = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
                                 typename IBase<RECORD>::template Float<false> >;
 template <int RECORD>
-using sip_idiv = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+using i_idiv = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
                                   typename IBase<RECORD>::IntDiv>;
 
 #endif

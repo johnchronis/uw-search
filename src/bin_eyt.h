@@ -1,6 +1,8 @@
 #ifndef BIN_EYT_H
 #define BIN_EYT_H
 
+// The search methods proposed in https://arxiv.org/pdf/1509.05053.pdf
+
 template <int record_bytes = 8, bool prefetch = false,
           typename Index = unsigned long>
 class b_eyt {
