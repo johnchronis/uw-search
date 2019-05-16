@@ -45,8 +45,8 @@ Example "experiments.tsv" :
 ```bash
 $ cat experiments.tsv
 DatasetSize	Distribution	Parameter	SearchAlgorithm	RecordSizeBytes	#threads
-2000	      uniform	      42	      bs	              8	              1
-2000	      uniform	      42	      sip 	            8	              1
+2000        uniform       42        bs              8                1
+2000        uniform       42        sip             8                1
 ```
 "searchbench" runs each experiment and reports the time required to search each subset.
 ```bash
