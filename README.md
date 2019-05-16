@@ -71,6 +71,7 @@ the time to search one record, calculated as described in Section [Performance E
 ```bash
 $ python3 gettimes.py 
 make: 'searchbench' is up to date.
+
 Time to search one record:
 Run  DatasetSize  Distribution  Parameter  #threads  SearchAlgorithm  RecordSizeBytes
 0    2000              uniform  42         1                      bs  8                  112.695
