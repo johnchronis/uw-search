@@ -48,7 +48,7 @@ DatasetSize Distribution  Parameter SearchAlgorithm RecordSizeBytes #threads
 2000        uniform       42        bs              8               1
 2000        uniform       42        sip             8               1
 ```
-"searchbench" runs each experiment and reports the time required to search each subset.
+"searchbench" runs each experiment and reports the time required to search each subset of 1000 records.
 ```bash
 $ ./searchbench experiments.tsv
 Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
