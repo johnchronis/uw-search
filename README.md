@@ -3,8 +3,9 @@ This repo will host the code used in the paper
 ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
 Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf).
 
-We have implemented various search methods and a benchmark framework that allows
-to configure various parameters like the:
+We have implemented various search methods and a benchmark framework that
+measures the performance of these methods. Using the benchmark framework we can
+easily control the following parameters:
 + size of the dataset  
   (minimum size: 1000 records)
 + distribution 
@@ -16,8 +17,13 @@ to configure various parameters like the:
 + number of threads
 
 
-
-
+## Performance Measurement
+To measure the performance of an algorithm for a given dataset, we randomly
+permute the keys contained in the dataset and search for all of them, this is
+called a run.
+To measure the execution time we measure the overall time to search
+subsets of 1,000 keys. The time to perform one search, the search time
+for each run is an average over the time to search each subset.
 
 
 ## Compilation
@@ -28,16 +34,3 @@ to configure various parameters like the:
 + The installation script is tested on Ubuntu 16.04 and 18.04
 
 
-
-## Performance Measurement
-
-
-
-To measure the performance of an algorithm for a given dataset, we randomly
-permute the keys contained in the dataset and search for all of them. We measure
-the overall time to search subsets of 1,000 keys, this is called a run. 
-
-In our evaluation, we compare the algorithms based on the time to perform one
-search. This is calculated as the median of the measured times of the multiple
-runs. The search time for each run is an average over the time to search each
-subset.

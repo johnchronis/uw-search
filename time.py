@@ -8,12 +8,14 @@ import subprocess
 
 call(['make', 'searchbench'])
 #run_param = ['algorithm', 'n', 'param', 'distribution', 'record', 'n_thds']
-run_param = ['Run','DatasetSize','Distribution','Parameter','#threads','SearchAlgorithm','RecordSizeBytes','TimeNS']
+run_param = ['Run','DatasetSize','Distribution','Parameter','#threads','SearchAlgorithm','RecordSizeBytes']
 
 with open("outfile", "w") as log_file:
     subprocess.run(["./searchbench","runs.tsv"], stdout=log_file)
 
-#df = read_csv("outfile", sep='\t')
+df = read_csv("outfile", sep='\t')
 
-#print(df)
+print(df.groupby(run_param)['TimeNS'].mean()
+
+# Print multiple statistics for each run
 #print(df.groupby(run_param)['TimeNS'].describe(percentiles=[.25,0.75]))
