@@ -4,7 +4,17 @@ This repo will host the code used in the paper
 Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf).
 
 We have implemented various search methods and a benchmark framework that allows
-to configure various parameters
+to configure various parameters like the:
++ size of the dataset  
+  (minimum size: 1000 records)
++ distribution 
++ parameter of the distribution
++ search algorithm  
+    (Interpolation Search, SIP, TIP, Binary Search)  
++ record size  
+    (each record contains an 8 Byte Key and a Payload that is controlled by the record size)
++ number of threads
+
 
 
 
