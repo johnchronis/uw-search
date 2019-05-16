@@ -6,4 +6,4 @@ and rapid iteration faster.
 + bin.h, bin_eyt.h: different implementations of Binary Search 
 + interpolate.h: implements all the variations of the IS, SIP, TIP. At the end of the file 
   you can find the definitions of the different search methods.
-+ benchmark.h: the orchestrator of the benchmarking framework.
++ benchmark.h: the orchestrator of the benchmarking framework. Also contains a more detailed list of all the implemented search algorithms.
