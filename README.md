@@ -49,6 +49,7 @@ $ ./searchbench experiments.tsv
 Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
 
 Run	DatasetSize	Distribution	Parameter	#threads	SearchAlgorithm	RecordSizeBytes	TimeNS
+
 Running experiment: 2000 uniform 42 8 b-lin 1
 0	  2000	      uniform	      42	      1	        b-lin	          8	              130.277
 0	  2000	      uniform	      42	      1	        b-lin	          8	              121.141
@@ -57,8 +58,6 @@ Running experiment: 2000 uniform 42 8 i-opt-8 1
 1	  2000	      uniform	      42	      1	        i-opt-8	        8	              73.189
 1	  2000	      uniform	      42	      1	        i-opt-8	        8	              66.527
 ```
-
-
 
 We provide a helper function implemented in Python "time.py" that compiles the code,
 runs the "searchbench" using a as input the file named "experiments.tsv" and reports back for each run
@@ -83,7 +82,7 @@ DatasetSize	Distribution	Parameter	SearchAlgorithm	RecordSizeBytes	#threads
 ```
 All the values must be tab separated.
 
-### Dataset
+### Datasets
 A dataset is identified by its name and one parameter as described in the following table:
 
 | Dataset       | Parameter     |
@@ -95,11 +94,22 @@ A dataset is identified by its name and one parameter as described in the follow
 | file | path of file |
 
 When the dataset is "file" then the file specified in "path of file" specifies all the keys that
-will be used in the benchmark. The file should contain one key per line.
+will be used in the benchmark. The file should contain one key per line. Examples of dataaset file can be found
+in src/datasets folder.
 
 For explanation of the parameters and dataset please refer to our paper: ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
 Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf).
 
 ### Algorithms
+
+The algorithm we have implemented in our code are:
+
+| Dataset       | Parameter     |
+| ------------- |:-------------:|
+| is       | Interpolation Search |
+| bs     | Binary Search      |
+| sip | SIP - Slope Reuse Interpolation Search    |
+| tip | TIP - Three Point Interpolation Search    |
+
 
 
