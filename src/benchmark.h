@@ -6,7 +6,6 @@
 #include "lin.h"
 #include "bin_eyt.h"
 #include "adaptivesearch.h"
-//#include "fib.h"
 
 #include "omp.h"
 #include "util.h"
@@ -78,7 +77,6 @@ private:
     assert(range >= v.size());
 
     std::mt19937_64 rng(seed);
-    // TODO make sure that this is correct
     std::uniform_int_distribution<Key> dist(1, range + 1);
     std::set<Key> skips;
     while (skips.size() + v.size() < range)
@@ -192,7 +190,6 @@ struct Run {
   InputParam input_param;
   std::string name;
   int n_thds;
-  // TODO consider removing
   bool ok;
 
   Run(InputParam input_param, std::string name, int n_thds)
@@ -206,8 +203,6 @@ struct Run {
 #else
     constexpr bool infinite_repeat = false;
 #endif
-    // I didn't get great results trying to find a particular value for the
-    // sample size, but this seemed to be not terrible
     constexpr int sample_size = 1000;
     const int n_samples = inputC.keys.size() / sample_size;
     auto &queries = inputC.permuted_keys;
@@ -216,7 +211,6 @@ struct Run {
     // have to specialize in the class itself. Maybe template macros?
     Search search(inputC.keys);
 
-    // std::vector<double> ns( run.n_thds);
     std::vector<double> ns(n_samples * run.n_thds);
     std::vector<int> subset_indexes(n_samples * run.n_thds);
     auto rng = std::mt19937(42);
@@ -227,7 +221,6 @@ struct Run {
         std::shuffle(it, it + n_samples, rng);
     }
 
-// TODO break apart by threads
 #pragma omp parallel default(none) num_threads(run.n_thds)                     \
     shared(queries, run, search, ns, subset_indexes)
     {
@@ -257,12 +250,10 @@ struct Run {
         // thread_ns[0] += ns_elapsed;
         if (!infinite_repeat)
           thread_ns[sample_index] = ns_elapsed / sample_size;
-        // should the sample index be included?
       }
 #pragma omp critical
       run.ok = run.ok && valSum == inputC.sum;
     }
-    // std::cerr << search.err << '\n';
     return ns;
   }
 
@@ -271,36 +262,44 @@ struct Run {
     using Fn = std::vector<double>(Run &, const InputBase &);
     using fn_tuple = std::tuple<const char *, Fn *>;
     using std::make_tuple;
-    constexpr auto algorithm_mapper = std::array<fn_tuple, 26>{
-      make_tuple("is", measure2<i_naive<record_bytes>, record_bytes>),
-//      make_tuple("i-seq", measure2<i_seq<record_bytes>, record_bytes>),
-//      make_tuple("i-no-guard",
-//                 measure2<i_no_guard<record_bytes>, record_bytes>),
-//      make_tuple("i-fp", measure2<i_fp<record_bytes>, record_bytes>),
-//      make_tuple("i-idiv", measure2<i_idiv<record_bytes>, record_bytes>),
-//      make_tuple("b-naive", measure2<BinaryLR<record_bytes>, record_bytes>),
+    constexpr auto algorithm_mapper = std::array<fn_tuple, 25>{
+      // Interpolation Search
+      make_tuple("is", measure2<is<record_bytes>, record_bytes>),
+      // SIP and TIP
+      make_tuple("sip", measure2<sip<record_bytes, 8>, record_bytes>),
+      make_tuple("tip", measure2<tip<record_bytes, 64>, record_bytes>),
+      // Interpolation Sequential
+      make_tuple("is-seq", measure2<is_seq<record_bytes>, record_bytes>),
+      // Binary Search
       make_tuple("bs", measure2<Binary<record_bytes>, record_bytes>),
-//      make_tuple("b-eyt", measure2<b_eyt<record_bytes, false>, record_bytes>),
-//      make_tuple("b-eyt-p", measure2<b_eyt<record_bytes, true>, record_bytes>),
-//      make_tuple("adaptivesearch", measure2<adaptivesearch<record_bytes>, record_bytes>),
-//      make_tuple("i-no-reuse-16",
-//                 measure2<i_no_reuse<record_bytes, 16>, record_bytes>),
-//      make_tuple("i-opt-0", measure2<i_opt<record_bytes, 0>, record_bytes>),
-      make_tuple("sip", measure2<i_opt<record_bytes, 8>, record_bytes>),
-//      make_tuple("i-opt-16", measure2<i_opt<record_bytes, 16>, record_bytes>),
-//      make_tuple("i-opt-32", measure2<i_opt<record_bytes, 32>, record_bytes>),
-//      make_tuple("i-opt-64", measure2<i_opt<record_bytes, 64>, record_bytes>),
-//      make_tuple("i-opt-128", measure2<i_opt<record_bytes, 128>, record_bytes>),
-//      make_tuple("i-hyp-0", measure2<i_hyp<record_bytes, 0>, record_bytes>),
-//      make_tuple("i-hyp-8", measure2<i_hyp<record_bytes, 8>, record_bytes>),
-//      make_tuple("i-hyp-16", measure2<i_hyp<record_bytes, 16>, record_bytes>),
-//      make_tuple("i-hyp-32", measure2<i_hyp<record_bytes, 32>, record_bytes>),
-      make_tuple("tip", measure2<i_hyp<record_bytes, 64>, record_bytes>),
-//      make_tuple("i-hyp-128", measure2<i_hyp<record_bytes, 128>, record_bytes>),
-//      make_tuple("i-hyp-256", measure2<i_hyp<record_bytes, 256>, record_bytes>),
-//      make_tuple("i-hyp-512", measure2<i_hyp<record_bytes, 512>, record_bytes>),
-//      make_tuple("i-hyp-1024",
-//                 measure2<i_hyp<record_bytes, 1024>, record_bytes>),
+      // A simpler version of binary search (keeps tracks of the search interval
+      // in a different way.
+      make_tuple("b-naive", measure2<BinaryLR<record_bytes>, record_bytes>),
+      // The search methods proposed in https://arxiv.org/pdf/1509.05053.pdf
+      make_tuple("b-eyt", measure2<b_eyt<record_bytes, false>, record_bytes>),
+      make_tuple("b-eyt-p", measure2<b_eyt<record_bytes, true>, record_bytes>),
+      // SIP and TIP with different guard sizes
+      make_tuple("sip-0", measure2<sip<record_bytes, 0>, record_bytes>),
+      make_tuple("sip-16", measure2<sip<record_bytes, 16>, record_bytes>),
+      make_tuple("sip-32", measure2<sip<record_bytes, 32>, record_bytes>),
+      make_tuple("sip-64", measure2<sip<record_bytes, 64>, record_bytes>),
+      make_tuple("sip-128", measure2<sip<record_bytes, 128>, record_bytes>),
+      make_tuple("tip-0", measure2<tip<record_bytes, 0>, record_bytes>),
+      make_tuple("tip-8", measure2<tip<record_bytes, 8>, record_bytes>),
+      make_tuple("tip-16", measure2<tip<record_bytes, 16>, record_bytes>),
+      make_tuple("tip-32", measure2<tip<record_bytes, 32>, record_bytes>),
+      make_tuple("tip-128", measure2<tip<record_bytes, 128>, record_bytes>),
+      make_tuple("tip-256", measure2<tip<record_bytes, 256>, record_bytes>),
+      make_tuple("tip-512", measure2<tip<record_bytes, 512>, record_bytes>),
+      make_tuple("tip-1024",
+                 measure2<tip<record_bytes, 1024>, record_bytes>),
+      // Variations of SIP with optimizations disabled.
+      make_tuple("sip-no-guard",
+                 measure2<sip_no_guard<record_bytes>, record_bytes>),
+      make_tuple("sip-fp", measure2<sip_fp<record_bytes>, record_bytes>),
+      make_tuple("sip-idiv", measure2<sip_idiv<record_bytes>, record_bytes>),
+      make_tuple("sip-no-reuse-16",
+                 measure2<sip_no_reuse<record_bytes, 16>, record_bytes>),
     };
     auto it = std::find_if(algorithm_mapper.begin(), algorithm_mapper.end(),
                            [run](const auto &x) {
@@ -362,6 +361,7 @@ InputBase::InputMap InputBase::load(std::vector<Run> runs) {
                      }());
     }
   }
+  std::cerr << std::endl;
   return inputs;
 }
 

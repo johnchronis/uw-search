@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <iostream>
 
 using Key = int64_t;
 using SearchFn = int64_t(const Key *, int64_t, Key);
@@ -51,8 +52,19 @@ constexpr inline int flr_lgl(uint64_t x) {
   return 64 - __builtin_clzl(x);
 }
 
+std::string removedoubletabs(std::string s) {
+  std::size_t pos = s.find("\t\t");
+  while(pos != std::string::npos) {
+    s.replace(pos, 2, "\t");
+    pos = s.find("\t\t");
+  }
+  return s;
+}
+
+
 std::vector<std::string> split(std::string s, char delim = ',') {
   std::vector<std::string> v;
+  s = removedoubletabs(s);
   for (auto it = s.begin(); it != s.end();) {
     auto start = it;
     it = std::find(it, s.end(), delim);
@@ -62,6 +74,8 @@ std::vector<std::string> split(std::string s, char delim = ',') {
   }
   return v;
 }
+
+
 
 auto read_line(std::ifstream &f) {
   std::string line;
