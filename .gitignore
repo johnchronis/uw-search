@@ -1,5 +1,8 @@
 clang5
 outfile
+searchbench
+experiment.tsc
+
 
 # Prerequisites
 *.d
