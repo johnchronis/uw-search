@@ -3,6 +3,7 @@ This repo will host the code used in the paper
 ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
 Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf).
 
+## Introduction
 We have implemented various search methods and a benchmarking framework that
 measures the performance of these methods. Using the benchmark framework we can
 easily control the following parameters:
@@ -35,22 +36,70 @@ to search each subset.
 
 ### Usage
 The "searchbench" execution expects one argument, a tsv file of experiments. Each line of the 
-tsv specifies the parameters of one experiment. One experiment uses one algorithm and a dataset and 
-reports the time required to search each subset.
+tsv specifies the parameters of one experiment, as described in  [Introduction](#introduction).
+One experiment uses one algorithm and a dataset and reports the time required to search each subset.
+
+```bash
+$ cat experiments.tsv
+DatasetSize	Distribution	Parameter	SearchAlgorithm	RecordSizeBytes	#threads
+2000	      uniform	      42	      b-lin	          8	              1
+2000	      uniform	      42	      i-opt-8	        8	              1
+
+$ ./searchbench experiments.tsv
+Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
+
+Run	DatasetSize	Distribution	Parameter	#threads	SearchAlgorithm	RecordSizeBytes	TimeNS
+Running experiment: 2000 uniform 42 8 b-lin 1
+0	  2000	      uniform	      42	      1	        b-lin	          8	              130.277
+0	  2000	      uniform	      42	      1	        b-lin	          8	              121.141
+
+Running experiment: 2000 uniform 42 8 i-opt-8 1
+1	  2000	      uniform	      42	      1	        i-opt-8	        8	              73.189
+1	  2000	      uniform	      42	      1	        i-opt-8	        8	              66.527
+```
+
+
 
 We provide a helper function implemented in Python "time.py" that compiles the code,
 runs the "searchbench" using a as input the file named "experiments.tsv" and reports back for each run
 the time to search one record, calculated as described in Section [Performance Evaluation](#performance-evaluation)
 
+```bash
+$ python3 gettimes.py 
+make: 'searchbench' is up to date.
+Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
+Running experiment: 2000 uniform 42 8 b-lin 1
+Running experiment: 2000 uniform 42 8 i-opt-8 1
 
+Run  DatasetSize  Distribution  Parameter  #threads  SearchAlgorithm  RecordSizeBytes
+0    2000         uniform       42         1         b-lin            8                  114.4260
+1    2000         uniform       42         1         i-opt-8          8                   71.1515
+```
 
+### TSV format
+The exeperiment tsv should include the following header:
+```bash
+DatasetSize	Distribution	Parameter	SearchAlgorithm	RecordSizeBytes	#threads
+```
+All the values must be tab separated.
 
+### Dataset
+A dataset is identified by its name and one parameter as described in the following table:
 
+| Dataset       | Parameter     |
+| ------------- |:-------------:|
+| uniform       | seed (integer)|
+| gap     | gap parameter       |
+| fal | shape parameter (double)    |
+| cfal | shape parameter (double)    |
+| file | path of file |
 
+When the dataset is "file" then the file specified in "path of file" specifies all the keys that
+will be used in the benchmark. The file should contain one key per line.
 
+For explanation of the parameters and dataset please refer to our paper: ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
+Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf).
 
-
-
-
+### Algorithms
 
 
