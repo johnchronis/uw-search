@@ -33,7 +33,7 @@ std::cout  << "Run\tDatasetSize\tDistribution\tParameter\t#threads\tSearchAlgori
     auto t1 = std::chrono::steady_clock::now();
     if (new_param != old_param) {
       std::cerr << '\n' << n << ' ' << distribution << ' ' << param << ' '
-                << record_bytes << ' ' << run.name << ' ' << run.n_thds;
+                << record_bytes << ' ' << run.name << ' ' << run.n_thds << '\n';
       old_param = new_param;
       t0 = t1;
     } else if (std::chrono::duration<double, std::milli>(t1 - t0).count() >
