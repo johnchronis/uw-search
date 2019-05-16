@@ -120,5 +120,5 @@ The algorithm we have implemented in our code are:
 If the searchbench is not producing output for an experiment the most propable cause it that a parameter is not
 tab separated in the "experiment.tsv"
 
-## Code
+## Implementation
 Please consult the README in the src folder for more information on where each search method is implemented.
