@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
       std::cout << std::setw(3)  << run_ix << "\t"
                 << std::setw(11) << n << "\t"
                 << std::setw(12) << distribution.c_str() << "\t"
-                << std::setw(10)  << basename(strdup(param.c_str())) << "\t"
+                << std::setw(10) << basename(strdup(param.c_str())) << "\t"
                 << std::setw(8)  << run.n_thds << "\t"
                 << std::setw(15) << run.name.c_str() << "\t"
                 << std::setw(15) << record_bytes << "\t"

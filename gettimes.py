@@ -15,9 +15,7 @@ with open("outfile", "w") as log_file:
 
 df = read_csv("outfile", sep='\t')
 
-
 print("\nTime to search one record:")
-
 print(df.groupby(run_param)['TimeNS'].mean())
 
 call(['rm', 'outfile'])
