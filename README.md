@@ -65,9 +65,10 @@ Run	DatasetSize	Distribution	Parameter	#threads	SearchAlgorithm	RecordSizeBytes	
 ```
 
 We provide a helper function implemented in Python "gettimes.py" that compiles the code,
-runs the "searchbench" using a as input the file named "experiments.tsv" and reports back for each run
+runs the "searchbench" using as input the file named "experiments.tsv" and reports back for each run
 the time to search one record, calculated as described in Section [Performance Evaluation](#performance-evaluation)
-
+This is the easiest way to benchmark different search methods. The gettimes.py can be easily modified to report more
+statistics from each experiment.
 ```bash
 $ python3 gettimes.py 
 make: 'searchbench' is up to date.
