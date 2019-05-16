@@ -42,8 +42,8 @@ One experiment uses one algorithm and a dataset and reports the time required to
 ```bash
 $ cat experiments.tsv
 DatasetSize	Distribution	Parameter	SearchAlgorithm	RecordSizeBytes	#threads
-2000	      uniform	      42	      b-lin	          8	              1
-2000	      uniform	      42	      i-opt-8	        8	              1
+2000	      uniform	      42	      bs	              8	              1
+2000	      uniform	      42	      sip 	            8	              1
 
 $ ./searchbench experiments.tsv
 Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
@@ -51,12 +51,12 @@ Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
 Run	DatasetSize	Distribution	Parameter	#threads	SearchAlgorithm	RecordSizeBytes	TimeNS
 
 Running experiment: 2000 uniform 42 8 b-lin 1
-0	  2000	      uniform	      42	      1	        b-lin	          8	              130.277
-0	  2000	      uniform	      42	      1	        b-lin	          8	              121.141
+0	  2000        uniform	        42	      1	        bs            8	              130.277
+0	  2000	      uniform	        42	      1	        bs	          8	              121.141
 
 Running experiment: 2000 uniform 42 8 i-opt-8 1
-1	  2000	      uniform	      42	      1	        i-opt-8	        8	              73.189
-1	  2000	      uniform	      42	      1	        i-opt-8	        8	              66.527
+1	  2000	      uniform	        42	      1	        sip	            8	              73.189
+1	  2000	      uniform	        42	      1	        sip	            8	              66.527
 ```
 
 We provide a helper function implemented in Python "time.py" that compiles the code,
@@ -67,12 +67,12 @@ the time to search one record, calculated as described in Section [Performance E
 $ python3 gettimes.py 
 make: 'searchbench' is up to date.
 Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
-Running experiment: 2000 uniform 42 8 b-lin 1
-Running experiment: 2000 uniform 42 8 i-opt-8 1
+Running experiment: 2000 uniform 42 8 bs 1
+Running experiment: 2000 uniform 42 8 sip 1
 
 Run  DatasetSize  Distribution  Parameter  #threads  SearchAlgorithm  RecordSizeBytes
-0    2000         uniform       42         1         b-lin            8                  114.4260
-1    2000         uniform       42         1         i-opt-8          8                   71.1515
+0    2000         uniform       42         1         bs               8                  114.4260
+1    2000         uniform       42         1         sip              8                   71.1515
 ```
 
 ### TSV format
