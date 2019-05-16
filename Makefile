@@ -13,12 +13,12 @@ run : searchbench
 
 gdb : debug
 gdb :
-		gdb --args ./debug runs.tsv
+		gdb --args ./debug experiments.tsv
 
 perf : CXXFLAGS += -O3 -DNDEBUG -DINFINITE_REPEAT
 perf :
 		$(CXX) $(CXXFLAGS) $(SOURCES) -o$@ $(LDFLAGS)
-		perf record -F99 -g ./perf runs.tsv
+		perf record -F99 -g ./perf experiments.tsv
 
 clean:
 		rm -f ./searchbench ./debug ./dump

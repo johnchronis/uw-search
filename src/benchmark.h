@@ -178,13 +178,13 @@ struct Run {
       if (!file.good())
         break;
       assert(fields.size() == header.size());
-      InputParam input_param{ .distribution = fields[header["distribution"]],
-                              .param = fields[header["param"]],
-                              .n = parse<long>(fields[header["n"]]),
+      InputParam input_param{ .distribution = fields[header["Distribution"]],
+                              .param = fields[header["Parameter"]],
+                              .n = parse<long>(fields[header["DatasetSize"]]),
                               .record_bytes =
-                                  parse<int>(fields[header["record"]]) };
-      runs.emplace_back(input_param, fields[header["algorithm"]],
-                        parse<int>(fields[header["thread"]]));
+                                  parse<int>(fields[header["RecordSizeBytes"]]) };
+      runs.emplace_back(input_param, fields[header["SearchAlgorithm"]],
+                        parse<int>(fields[header["#threads"]]));
     }
     return runs;
   }
@@ -272,35 +272,35 @@ struct Run {
     using fn_tuple = std::tuple<const char *, Fn *>;
     using std::make_tuple;
     constexpr auto algorithm_mapper = std::array<fn_tuple, 26>{
-      make_tuple("i-naive", measure2<i_naive<record_bytes>, record_bytes>),
-      make_tuple("i-seq", measure2<i_seq<record_bytes>, record_bytes>),
-      make_tuple("i-no-guard",
-                 measure2<i_no_guard<record_bytes>, record_bytes>),
-      make_tuple("i-fp", measure2<i_fp<record_bytes>, record_bytes>),
-      make_tuple("i-idiv", measure2<i_idiv<record_bytes>, record_bytes>),
-      make_tuple("b-naive", measure2<BinaryLR<record_bytes>, record_bytes>),
-      make_tuple("b-lin", measure2<Binary<record_bytes>, record_bytes>),
-      make_tuple("b-eyt", measure2<b_eyt<record_bytes, false>, record_bytes>),
-      make_tuple("b-eyt-p", measure2<b_eyt<record_bytes, true>, record_bytes>),
-      make_tuple("adaptivesearch", measure2<adaptivesearch<record_bytes>, record_bytes>),
-      make_tuple("i-no-reuse-16",
-                 measure2<i_no_reuse<record_bytes, 16>, record_bytes>),
-      make_tuple("i-opt-0", measure2<i_opt<record_bytes, 0>, record_bytes>),
-      make_tuple("i-opt-8", measure2<i_opt<record_bytes, 8>, record_bytes>),
-      make_tuple("i-opt-16", measure2<i_opt<record_bytes, 16>, record_bytes>),
-      make_tuple("i-opt-32", measure2<i_opt<record_bytes, 32>, record_bytes>),
-      make_tuple("i-opt-64", measure2<i_opt<record_bytes, 64>, record_bytes>),
-      make_tuple("i-opt-128", measure2<i_opt<record_bytes, 128>, record_bytes>),
-      make_tuple("i-hyp-0", measure2<i_hyp<record_bytes, 0>, record_bytes>),
-      make_tuple("i-hyp-8", measure2<i_hyp<record_bytes, 8>, record_bytes>),
-      make_tuple("i-hyp-16", measure2<i_hyp<record_bytes, 16>, record_bytes>),
-      make_tuple("i-hyp-32", measure2<i_hyp<record_bytes, 32>, record_bytes>),
-      make_tuple("i-hyp-64", measure2<i_hyp<record_bytes, 64>, record_bytes>),
-      make_tuple("i-hyp-128", measure2<i_hyp<record_bytes, 128>, record_bytes>),
-      make_tuple("i-hyp-256", measure2<i_hyp<record_bytes, 256>, record_bytes>),
-      make_tuple("i-hyp-512", measure2<i_hyp<record_bytes, 512>, record_bytes>),
-      make_tuple("i-hyp-1024",
-                 measure2<i_hyp<record_bytes, 1024>, record_bytes>),
+      make_tuple("is", measure2<i_naive<record_bytes>, record_bytes>),
+//      make_tuple("i-seq", measure2<i_seq<record_bytes>, record_bytes>),
+//      make_tuple("i-no-guard",
+//                 measure2<i_no_guard<record_bytes>, record_bytes>),
+//      make_tuple("i-fp", measure2<i_fp<record_bytes>, record_bytes>),
+//      make_tuple("i-idiv", measure2<i_idiv<record_bytes>, record_bytes>),
+//      make_tuple("b-naive", measure2<BinaryLR<record_bytes>, record_bytes>),
+      make_tuple("bs", measure2<Binary<record_bytes>, record_bytes>),
+//      make_tuple("b-eyt", measure2<b_eyt<record_bytes, false>, record_bytes>),
+//      make_tuple("b-eyt-p", measure2<b_eyt<record_bytes, true>, record_bytes>),
+//      make_tuple("adaptivesearch", measure2<adaptivesearch<record_bytes>, record_bytes>),
+//      make_tuple("i-no-reuse-16",
+//                 measure2<i_no_reuse<record_bytes, 16>, record_bytes>),
+//      make_tuple("i-opt-0", measure2<i_opt<record_bytes, 0>, record_bytes>),
+      make_tuple("sip", measure2<i_opt<record_bytes, 8>, record_bytes>),
+//      make_tuple("i-opt-16", measure2<i_opt<record_bytes, 16>, record_bytes>),
+//      make_tuple("i-opt-32", measure2<i_opt<record_bytes, 32>, record_bytes>),
+//      make_tuple("i-opt-64", measure2<i_opt<record_bytes, 64>, record_bytes>),
+//      make_tuple("i-opt-128", measure2<i_opt<record_bytes, 128>, record_bytes>),
+//      make_tuple("i-hyp-0", measure2<i_hyp<record_bytes, 0>, record_bytes>),
+//      make_tuple("i-hyp-8", measure2<i_hyp<record_bytes, 8>, record_bytes>),
+//      make_tuple("i-hyp-16", measure2<i_hyp<record_bytes, 16>, record_bytes>),
+//      make_tuple("i-hyp-32", measure2<i_hyp<record_bytes, 32>, record_bytes>),
+      make_tuple("tip", measure2<i_hyp<record_bytes, 64>, record_bytes>),
+//      make_tuple("i-hyp-128", measure2<i_hyp<record_bytes, 128>, record_bytes>),
+//      make_tuple("i-hyp-256", measure2<i_hyp<record_bytes, 256>, record_bytes>),
+//      make_tuple("i-hyp-512", measure2<i_hyp<record_bytes, 512>, record_bytes>),
+//      make_tuple("i-hyp-1024",
+//                 measure2<i_hyp<record_bytes, 1024>, record_bytes>),
     };
     auto it = std::find_if(algorithm_mapper.begin(), algorithm_mapper.end(),
                            [run](const auto &x) {

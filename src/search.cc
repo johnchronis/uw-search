@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
   std::vector<Run> runs = Run::load(std::ifstream(argv[1]));
   auto inputs = InputBase::load(runs);
-std::cout  << "Run\tDatasetSize\tDistribution\tParameter\t#threads\tSearchAlgorithm\tRecordSizeBytes\tTimeNS\n";
+  std::cout  << "Run\tDatasetSize\tDistribution\tParameter\t#threads\tSearchAlgorithm\tRecordSizeBytes\tTimeNS\n\n";
   int run_ix = 0;
 
   RunTuple old_param;
@@ -32,7 +32,8 @@ std::cout  << "Run\tDatasetSize\tDistribution\tParameter\t#threads\tSearchAlgori
     RunTuple new_param{ run.input_param, run.name, run.n_thds };
     auto t1 = std::chrono::steady_clock::now();
     if (new_param != old_param) {
-      std::cerr << '\n' << n << ' ' << distribution << ' ' << param << ' '
+      std::cerr << "Running experiment: ";
+      std::cerr << n << ' ' << distribution << ' ' << param << ' '
                 << record_bytes << ' ' << run.name << ' ' << run.n_thds << '\n';
       old_param = new_param;
       t0 = t1;
