@@ -118,7 +118,7 @@ template <int record_bytes> class IBase {
 // TIP
 template <int record_bytes, int guard_off,
     class Interpolate = typename IBase<record_bytes>::template Hyp3<> >
-class i_hyp : public IBase<record_bytes> {
+class tip : public IBase<record_bytes> {
   using Super = IBase<record_bytes>;
   using Vector = typename Super::Vector;
   using typename Super::Index;
@@ -138,7 +138,7 @@ class i_hyp : public IBase<record_bytes> {
   }
 
  public:
-  i_hyp(const Vector &v) : Super(v), interpolate(A) { assert(A.size() >= 1); }
+  tip(const Vector &v) : Super(v), interpolate(A) { assert(A.size() >= 1); }
 
   __attribute__((always_inline)) Key operator()(const Key x) {
     Index left = 0, right = A.size() - 1, next_1 = A.size() >> 1,
@@ -315,37 +315,38 @@ class InterpolationSlope : public IBase<record_bytes> {
 };
 
 /*
- * i_naive : Naive-IS
- * i_opt : Optimized-IS
- * i_seq : Interpolation-Sequential
- * i_recompute : Don't re-use slope
- * i_no_guard : guard = 0
- * i_fp : use FP division
- * i_idiv : use int division
+ * is : Vanilla Interpolation Search
+ * sip : SIP
+ * is_seq : Interpolation-Sequential
+ * sip_no_reuse: Don't re-use slope
+ * sip_no_guard : SIP with no guard (guard = 0)
+ * sip_fp : use FP division
+ * sip_idiv : use int division
  */
 template <int record_bytes>
-using i_naive =
+using is =
 Interpolation<record_bytes,
               typename IBase<record_bytes>::template Float<false>,
               IBase<record_bytes>::Recurse, -1>;
 template <int RECORD, int GUARD>
-using i_opt =
+using sip =
 InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
                    typename IBase<RECORD>::template Float<>, GUARD>;
-template <int RECORD> using i_seq = InterpolationSlope<RECORD, 1>;
+template <int RECORD> using is_seq =
+InterpolationSlope<RECORD, 1>;
 template <int RECORD, int GUARD>
-using i_no_reuse =
+using sip_no_reuse =
 Interpolation<RECORD, typename IBase<RECORD>::template Float<>,
               IBase<RECORD>::Recurse, GUARD>;
 template <int RECORD>
-using i_no_guard =
+using sip_no_guard =
 InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
                    typename IBase<RECORD>::template Float<>, -1>;
 template <int RECORD>
-using i_fp = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
-                                typename IBase<RECORD>::template Float<false> >;
+using sip_fp = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+                                  typename IBase<RECORD>::template Float<false> >;
 template <int RECORD>
-using i_idiv = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
-                                  typename IBase<RECORD>::IntDiv>;
+using sip_idiv = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+                                    typename IBase<RECORD>::IntDiv>;
 
 #endif
