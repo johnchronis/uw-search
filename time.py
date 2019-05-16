@@ -14,6 +14,7 @@ with open("outfile", "w") as log_file:
 
 df = read_csv("outfile", sep='\t')
 
-#print(df.groupby(run_param)['TimeNS'].describe(percentiles=[.25,0.75]))
-print(df.groupby(run_param)['TimeNS'].describe(percentiles=[.5]))
+print(df.groupby(run_param)['TimeNS'].mean())
 
+#More detailed statistics
+#print(df.groupby(run_param)['TimeNS'].describe(percentiles=[.25,0.75]))
