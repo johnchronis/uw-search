@@ -118,7 +118,7 @@ public:
       : permuted_keys(n), keys(n) {
     auto param = params.begin();
     // uniform - seed
-    // gaps    - seed, range
+    // gap    - seed, range
     // FB      - file
     // fal     - shape
     // cfal    - shape
