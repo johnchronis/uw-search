@@ -9,6 +9,8 @@ SOURCES=src/search.cc
 .PHONY: run gdb clean perf
 
 ##### Run Targets ######
+run : searchbench experiments.tsv
+
 gdb : debug
 gdb :
 		gdb --args ./debug experiments.tsv

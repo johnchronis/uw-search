@@ -10,9 +10,9 @@ DatasetSize	Distribution	Parameter	SearchAlgorithm	RecordSizeBytes	#threads
 10000	gap	47,0.1	is	8	1	
 10000	gap	47,0.1	bs	8	1
 10000	gap	47,0.1	sip	8	1
-10000	gap	47,0.9	is	8	1
-10000	gap	47,0.9	bs	8	1
-10000	gap	47,0.9	sip	8	1
-10000	gap	47,1	is	8	1
-10000	gap	47,1	bs	8	1
-10000	gap	47,1	sip	8	1
+10000	gap	47,0.9	is	128	1
+10000	gap	47,0.9	bs	128	1
+10000	gap	47,0.9	sip	128	1
+10000	gap	47,1	is	32	1
+10000	gap	47,1	bs	32	1
+10000	gap	47,1	sip	32	1
