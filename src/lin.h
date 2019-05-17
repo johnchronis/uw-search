@@ -1,9 +1,9 @@
 #ifndef LIN_H
 #define LIN_H
 
-#include <x86intrin.h>
 #include "padded_vector.h"
 #include "util.h"
+#include <x86intrin.h>
 //#include <iacaMarks.h>
 
 template <class Vector, int n = 8> class LinearUnroll {

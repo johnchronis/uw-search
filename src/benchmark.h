@@ -1,10 +1,10 @@
 #ifndef BENCHMARK_H
 #define BENCHMARK_H
 
-#include "interpolate.h"
 #include "bin.h"
-#include "lin.h"
 #include "bin_eyt.h"
+#include "interpolate.h"
+#include "lin.h"
 
 #include "omp.h"
 #include "util.h"
@@ -18,9 +18,9 @@
 #include <map>
 #include <numeric>
 #include <random>
+#include <set>
 #include <sstream>
 #include <string>
-#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -46,13 +46,11 @@ struct InputParam {
 
   using Tuple = std::tuple<std::string, std::string, long, int>;
 
-  operator Tuple() {
-    return Tuple{ distribution, param, n, record_bytes };
-  }
+  operator Tuple() { return Tuple{distribution, param, n, record_bytes}; }
 };
 
 struct InputBase {
-  using InputMap = std::map<InputParam::Tuple, std::unique_ptr<InputBase> >;
+  using InputMap = std::map<InputParam::Tuple, std::unique_ptr<InputBase>>;
   static InputMap load(std::vector<Run> runs);
 };
 
@@ -135,8 +133,8 @@ public:
       auto seed = parse<long>(param[0]);
       fill(uniform(seed));
     } else if (distribution == "gap") {
-      auto[ seed, sparsity ] =
-          std::tuple{ parse<long>(param[0]), parse<double>(param[1]) };
+      auto[seed, sparsity] =
+          std::tuple{parse<long>(param[0]), parse<double>(param[1])};
       fill(gap(seed, sparsity));
     } else if (distribution == "fal") {
       auto shape = parse<double>(param[0]);
@@ -144,11 +142,11 @@ public:
     } else if (distribution == "cfal") {
       auto shape = parse<double>(param[0]);
       fill(cfal(shape));
-    } else if (std::set<std::string> { "file", "fb", "wf", "lognormal" }.count(
+    } else if (std::set<std::string>{"file", "fb", "wf", "lognormal"}.count(
                    distribution) == 1) {
-      std::ifstream file{ param[0] };
-      fill(std::vector<Key>{ std::istream_iterator<Key>{ file },
-                             std::istream_iterator<Key>() });
+      std::ifstream file{param[0]};
+      fill(std::vector<Key>{std::istream_iterator<Key>{file},
+                            std::istream_iterator<Key>()});
     } else {
       assert(!"No distribution found.");
     }
@@ -175,11 +173,11 @@ struct Run {
       if (!file.good())
         break;
       assert(fields.size() == header.size());
-      InputParam input_param{ .distribution = fields[header["Distribution"]],
-                              .param = fields[header["Parameter"]],
-                              .n = parse<long>(fields[header["DatasetSize"]]),
-                              .record_bytes =
-                                  parse<int>(fields[header["RecordSizeBytes"]]) };
+      InputParam input_param{.distribution = fields[header["Distribution"]],
+                             .param = fields[header["Parameter"]],
+                             .n = parse<long>(fields[header["DatasetSize"]]),
+                             .record_bytes =
+                                 parse<int>(fields[header["RecordSizeBytes"]])};
       runs.emplace_back(input_param, fields[header["SearchAlgorithm"]],
                         parse<int>(fields[header["#threads"]]));
     }
@@ -220,8 +218,8 @@ struct Run {
         std::shuffle(it, it + n_samples, rng);
     }
 
-#pragma omp parallel default(none) num_threads(run.n_thds)                     \
-    shared(queries, run, search, ns, subset_indexes)
+#pragma omp parallel default(none)                                             \
+    num_threads(run.n_thds) shared(queries, run, search, ns, subset_indexes)
     {
       const int tid = omp_get_thread_num();
       const auto &thread_ns = &ns[tid * n_samples];
@@ -262,48 +260,49 @@ struct Run {
     using fn_tuple = std::tuple<const char *, Fn *>;
     using std::make_tuple;
     constexpr auto algorithm_mapper = std::array<fn_tuple, 25>{
-      // Interpolation Search
-      make_tuple("is", measure2<is<record_bytes>, record_bytes>),
-      // SIP and TIP
-      make_tuple("sip", measure2<sip<record_bytes, 8>, record_bytes>),
-      make_tuple("tip", measure2<tip<record_bytes, 64>, record_bytes>),
-      // Interpolation Sequential
-      make_tuple("is-seq", measure2<is_seq<record_bytes>, record_bytes>),
-      // Binary Search
-      make_tuple("bs", measure2<Binary<record_bytes>, record_bytes>),
-      // A simpler version of binary search (keeps tracks of the search interval
-      // in a different way.
-      make_tuple("b-naive", measure2<BinaryLR<record_bytes>, record_bytes>),
-      // The search methods proposed in https://arxiv.org/pdf/1509.05053.pdf
-      make_tuple("b-eyt", measure2<b_eyt<record_bytes, false>, record_bytes>),
-      make_tuple("b-eyt-p", measure2<b_eyt<record_bytes, true>, record_bytes>),
-      // SIP and TIP with different guard sizes
-      make_tuple("sip-0", measure2<sip<record_bytes, 0>, record_bytes>),
-      make_tuple("sip-16", measure2<sip<record_bytes, 16>, record_bytes>),
-      make_tuple("sip-32", measure2<sip<record_bytes, 32>, record_bytes>),
-      make_tuple("sip-64", measure2<sip<record_bytes, 64>, record_bytes>),
-      make_tuple("sip-128", measure2<sip<record_bytes, 128>, record_bytes>),
-      make_tuple("tip-0", measure2<tip<record_bytes, 0>, record_bytes>),
-      make_tuple("tip-8", measure2<tip<record_bytes, 8>, record_bytes>),
-      make_tuple("tip-16", measure2<tip<record_bytes, 16>, record_bytes>),
-      make_tuple("tip-32", measure2<tip<record_bytes, 32>, record_bytes>),
-      make_tuple("tip-128", measure2<tip<record_bytes, 128>, record_bytes>),
-      make_tuple("tip-256", measure2<tip<record_bytes, 256>, record_bytes>),
-      make_tuple("tip-512", measure2<tip<record_bytes, 512>, record_bytes>),
-      make_tuple("tip-1024",
-                 measure2<tip<record_bytes, 1024>, record_bytes>),
-      // Variations of SIP with optimizations disabled.
-      make_tuple("sip-no-guard",
-                 measure2<sip_no_guard<record_bytes>, record_bytes>),
-      make_tuple("sip-fp", measure2<sip_fp<record_bytes>, record_bytes>),
-      make_tuple("sip-idiv", measure2<sip_idiv<record_bytes>, record_bytes>),
-      make_tuple("sip-no-reuse-16",
-                 measure2<sip_no_reuse<record_bytes, 16>, record_bytes>),
+        // Interpolation Search
+        make_tuple("is", measure2<is<record_bytes>, record_bytes>),
+        // SIP and TIP
+        make_tuple("sip", measure2<sip<record_bytes, 8>, record_bytes>),
+        make_tuple("tip", measure2<tip<record_bytes, 64>, record_bytes>),
+        // Interpolation Sequential
+        make_tuple("is-seq", measure2<is_seq<record_bytes>, record_bytes>),
+        // Binary Search
+        make_tuple("bs", measure2<Binary<record_bytes>, record_bytes>),
+        // A simpler version of binary search (keeps tracks of the search
+        // interval
+        // in a different way.
+        make_tuple("b-naive", measure2<BinaryLR<record_bytes>, record_bytes>),
+        // The search methods proposed in https://arxiv.org/pdf/1509.05053.pdf
+        make_tuple("b-eyt", measure2<b_eyt<record_bytes, false>, record_bytes>),
+        make_tuple("b-eyt-p",
+                   measure2<b_eyt<record_bytes, true>, record_bytes>),
+        // SIP and TIP with different guard sizes
+        make_tuple("sip-0", measure2<sip<record_bytes, 0>, record_bytes>),
+        make_tuple("sip-16", measure2<sip<record_bytes, 16>, record_bytes>),
+        make_tuple("sip-32", measure2<sip<record_bytes, 32>, record_bytes>),
+        make_tuple("sip-64", measure2<sip<record_bytes, 64>, record_bytes>),
+        make_tuple("sip-128", measure2<sip<record_bytes, 128>, record_bytes>),
+        make_tuple("tip-0", measure2<tip<record_bytes, 0>, record_bytes>),
+        make_tuple("tip-8", measure2<tip<record_bytes, 8>, record_bytes>),
+        make_tuple("tip-16", measure2<tip<record_bytes, 16>, record_bytes>),
+        make_tuple("tip-32", measure2<tip<record_bytes, 32>, record_bytes>),
+        make_tuple("tip-128", measure2<tip<record_bytes, 128>, record_bytes>),
+        make_tuple("tip-256", measure2<tip<record_bytes, 256>, record_bytes>),
+        make_tuple("tip-512", measure2<tip<record_bytes, 512>, record_bytes>),
+        make_tuple("tip-1024", measure2<tip<record_bytes, 1024>, record_bytes>),
+        // Variations of SIP with optimizations disabled.
+        make_tuple("sip-no-guard",
+                   measure2<sip_no_guard<record_bytes>, record_bytes>),
+        make_tuple("sip-fp", measure2<sip_fp<record_bytes>, record_bytes>),
+        make_tuple("sip-idiv", measure2<sip_idiv<record_bytes>, record_bytes>),
+        make_tuple("sip-no-reuse-16",
+                   measure2<sip_no_reuse<record_bytes, 16>, record_bytes>),
     };
-    auto it = std::find_if(algorithm_mapper.begin(), algorithm_mapper.end(),
-                           [run](const auto &x) {
-      return std::string(std::get<const char *>(x)) == run.name;
-    });
+    auto it = std::find_if(
+        algorithm_mapper.begin(), algorithm_mapper.end(), [run](const auto &x) {
+          return std::string(std::get<const char *>(x)) == run.name;
+        });
     if (it == algorithm_mapper.end()) {
       std::cerr << "algorithm " << run.name << " not found.";
       assert(!"Algorithm not found");
@@ -313,7 +312,7 @@ struct Run {
   }
 
   auto operator()(const InputBase &input) {
-    auto[ n, distribution, param, record_bytes ] = input_param;
+    auto[n, distribution, param, record_bytes] = input_param;
     std::vector<double> ns;
     switch (input_param.record_bytes) {
 #define CASE(N)                                                                \
@@ -339,25 +338,25 @@ InputBase::InputMap InputBase::load(std::vector<Run> runs) {
   for (auto r : runs) {
     auto input_param = r.input_param;
     if (inputs.count(input_param) == 0) {
-      std::cerr << "Loading Dataset size:" << input_param.n << ", distribution: " << input_param.distribution
+      std::cerr << "Loading Dataset size:" << input_param.n
+                << ", distribution: " << input_param.distribution
                 << ", distribution parameter: " << input_param.param << '\n';
       auto distribution_param = split(input_param.param);
-      inputs.emplace((InputParam::Tuple)input_param,
-                     [=]() {
-                       switch (input_param.record_bytes) {
-#define CASE(N) \
-          case N: return static_cast<std::unique_ptr<InputBase>>( \
-                      std::make_unique<Input<N>>(input_param.n, \
-                        input_param.distribution, distribution_param))
-                         CASE(8);
-                         CASE(32);
-                         CASE(128);
+      inputs.emplace((InputParam::Tuple)input_param, [=]() {
+        switch (input_param.record_bytes) {
+#define CASE(N)                                                                \
+  case N:                                                                      \
+    return static_cast<std::unique_ptr<InputBase>>(std::make_unique<Input<N>>( \
+        input_param.n, input_param.distribution, distribution_param))
+          CASE(8);
+          CASE(32);
+          CASE(128);
 #undef CASE
-                       default:
-                         assert(!"record size not supported");
-                       };
-                       return std::make_unique<InputBase>();
-                     }());
+        default:
+          assert(!"record size not supported");
+        };
+        return std::make_unique<InputBase>();
+      }());
     }
   }
   std::cerr << std::endl;

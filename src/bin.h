@@ -1,12 +1,12 @@
 #ifndef BIN_H
 #define BIN_H
 
-#include <cinttypes>
 #include <assert.h>
+#include <cinttypes>
 
 #include "lin.h"
-#include "util.h"
 #include "padded_vector.h"
+#include "util.h"
 
 #include <limits>
 
@@ -24,7 +24,7 @@ class BinaryLR {
   using Vector = PaddedVector<record_bytes>;
   using Linear = LinearUnroll<Vector>;
 
-  const Vector& A;
+  const Vector &A;
   int lg_v;
 
 public:

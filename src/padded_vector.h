@@ -1,9 +1,9 @@
 #ifndef PADDED_VECTOR_H
 #define PADDED_VECTOR_H
 
-#include <vector>
 #include "util.h"
 #include <limits>
+#include <vector>
 
 template <int record_bytes = 128, int pad = 32> class PaddedVector {
   static constexpr int payload_bytes = record_bytes - sizeof(Key);
@@ -46,9 +46,7 @@ public:
     return v[ix + pad].k;
   }
   auto begin() { return v.begin() + pad; }
-  auto end() {
-    return v.end() - pad;
-  };
+  auto end() { return v.end() - pad; };
   const Key *cbegin() const { return v.data() + pad; }
   size_t size() const { return v.size() - 2 * pad; }
   Key back() const { return (*this)[size() - 1]; }

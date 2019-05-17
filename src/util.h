@@ -2,13 +2,13 @@
 #define UTIL_H
 
 #include <algorithm>
-#include <cinttypes>
 #include <assert.h>
-#include <vector>
-#include <string>
-#include <sstream>
+#include <cinttypes>
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 using Key = int64_t;
 using SearchFn = int64_t(const Key *, int64_t, Key);
@@ -54,13 +54,12 @@ constexpr inline int flr_lgl(uint64_t x) {
 
 std::string removedoubletabs(std::string s) {
   std::size_t pos = s.find("\t\t");
-  while(pos != std::string::npos) {
+  while (pos != std::string::npos) {
     s.replace(pos, 2, "\t");
     pos = s.find("\t\t");
   }
   return s;
 }
-
 
 std::vector<std::string> split(std::string s, char delim = ',') {
   std::vector<std::string> v;
@@ -74,8 +73,6 @@ std::vector<std::string> split(std::string s, char delim = ',') {
   }
   return v;
 }
-
-
 
 auto read_line(std::ifstream &f) {
   std::string line;
