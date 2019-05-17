@@ -321,6 +321,7 @@ class tip : public IBase<record_bytes> {
  * sip_no_guard : SIP with no guard (guard = 0)
  * sip_fp : use FP division
  * sip_idiv : use int division
+ * tip : Three Point Interpolation Search
  */
 template <int record_bytes>
 using is = InterpolationSearch<record_bytes,
@@ -341,9 +342,8 @@ using sip_no_guard =
   SIPSearch<RECORD, IBase<RECORD>::Recurse,
                        typename IBase<RECORD>::template Float<>, -1>;
 template <int RECORD>
-using sip_fp =
-  SIPSearch<RECORD, IBase<RECORD>::Recurse,
-                       typename IBase<RECORD>::template Float<false>>;
+using sip_fp = SIPSearch<RECORD, IBase<RECORD>::Recurse,
+  typename IBase<RECORD>::template Float<false>>;
 
 template <int RECORD>
 using sip_idiv = SIPSearch<RECORD, IBase<RECORD>::Recurse,
