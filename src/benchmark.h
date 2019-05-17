@@ -5,7 +5,6 @@
 #include "bin.h"
 #include "lin.h"
 #include "bin_eyt.h"
-#include "adaptivesearch.h"
 
 #include "omp.h"
 #include "util.h"
