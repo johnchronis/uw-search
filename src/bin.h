@@ -10,13 +10,6 @@
 
 #include <limits>
 
-#if IACA == 1
-#include <iacaMarks.h>
-#else
-#define IACA_START
-#define IACA_END
-#endif
-
 template <int record_bytes = 8, bool RETURN_EARLY = true, bool TEST_EQ = true,
           bool FOR = false, int MIN_EQ_SZ = 1>
 class BinaryLR {
@@ -39,7 +32,6 @@ public:
     Index r = A.size();
 
     for (int i = 0; FOR ? i < lg_v : r - l > 1; i++) {
-      // IACA_START
       assert(l <= r);     // ordering check
       assert(l + r >= r); // overflow check
       Index m = (l + r) / 2;
@@ -61,7 +53,6 @@ public:
       }
     }
     if (MIN_EQ_SZ == 1) {
-      // IACA_END
       return A[l];
     }
 
@@ -105,7 +96,7 @@ public:
 #define LOOP                                                                   \
   assert(left + n == A.size() || A[left + n] > x);                             \
   assert(A[left] <= x);                                                        \
-  IACA_START Index half = n / 2;                                               \
+  Index half = n / 2;                                                          \
   if (TEST_EQ) {                                                               \
     if (x < A[left + half]) {                                                  \
       n = half;                                                                \
@@ -139,8 +130,6 @@ public:
         LOOP
       }
     }
-
-    IACA_END
     if (MIN_EQ_SZ == 1)
       return A[left];
 

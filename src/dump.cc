@@ -3,6 +3,8 @@
 
 #include <vector>
 
+// Dumps out a dataset created by the benchmarking framework.
+// ./dump experiments.tsv
 template <int record_bytes = 8>
 void dump_keys(InputBase &in, const std::string &distribution,
                const std::string &param, long n) {

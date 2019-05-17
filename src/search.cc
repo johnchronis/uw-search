@@ -46,14 +46,14 @@ int main(int argc, char *argv[]) {
                   << "Parameter\t" << std::setw(8) << "#threads\t"
                   << std::setw(15) << "SearchAlgorithm\t" << std::setw(15)
                   << "RecordSizeBytes\t" << std::setw(6) << "TimeNS\t"
-                  << std::endl;
+                  << "\n";
       } else {
         std::cerr << std::setw(3) << "Run\t" << std::setw(11) << "DatasetSize\t"
                   << std::setw(12) << "Distribution\t" << std::setw(10)
                   << "Parameter\t" << std::setw(8) << "#threads\t"
                   << std::setw(15) << "SearchAlgorithm\t" << std::setw(15)
                   << "RecordSizeBytes\t" << std::setw(6) << "TimeNS\t"
-                  << std::endl;
+                  << "\n";
       }
     } else if (std::chrono::duration<double, std::milli>(t1 - t0).count() >
                1000.0) {
@@ -71,10 +71,10 @@ int main(int argc, char *argv[]) {
                 << std::setw(8) << run.n_thds << "\t" << std::setw(15)
                 << run.name.c_str() << "\t" << std::setw(15) << record_bytes
                 << "\t" << std::setw(6) << std::setprecision(5) << ns << "\t"
-                << std::endl;
+                << "\n";
     }
     run_ix++;
-    std::cerr << std::endl;
+    std::cerr << "\n";;
   }
   std::cerr << '\n';
 }
