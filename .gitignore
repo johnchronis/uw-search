@@ -1,7 +1,7 @@
 clang5
 outfile
 searchbench
-
+dump
 
 # Prerequisites
 *.d
