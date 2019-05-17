@@ -5,8 +5,9 @@ Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Se
 
 ## Introduction
 We have implemented various search methods and a benchmarking framework that
-measures the performance of these methods. We measure the time to search on record of 
-a dataset, each record consists of a key and a payload. The keys are 8 Byte integers.
+measures the performance of these methods. We measure the time to search for a
+record of a dataset. Each record consists of a key and a payload, the keys are 
+8 Byte integers but the payloads can be varied across datasets.
 
 Using the benchmark framework we can easily control the following parameters:
 + size of the dataset  
@@ -14,19 +15,19 @@ Using the benchmark framework we can easily control the following parameters:
 + distribution of the keys
 + parameter of the distribution (described in detail later)
 + search algorithm  
-    (Interpolation Search, SIP, TIP, Binary Search)  
+    (Interpolation Search, SIP, TIP, Binary Search, ...)  
 + record size  
     (each record contains an 8 Byte Key and a Payload that is controlled by the record size)
-+ number of search threads
++ number of threads, the search for a single record is handled by one thread.
 
 ## Performance Evaluation
 To measure the performance of an algorithm for a given dataset, we randomly
 permute the keys contained in the dataset and search for all of them, this is
 called a run.
-To measure the execution time of each algorithm we measure the overall time to search
-subsets of 1,000 keys for each run. To compare algorithms we use the time required to 
-seacrh for one record.  The search time for each run is an average over the time 
-to search each subset.
+We measure the execution time to search subsets of 1,000 keys for each run.
+To compare algorithms we use the time required to seacrh for one record.  
+The time to search for one record is calculated as an average over the time to 
+search each subset.
 
 ## How to use
 ### Compilation
@@ -34,7 +35,7 @@ to search each subset.
    python3 and pandas. clang5 will be downloaded inside this repo.
 2) Run "make" to produce the "searchbench" executable.
 
-+ The installation script is tested on Ubuntu 16.04 and 18.04
++ The installation script is validated on Ubuntu 16.04 and 18.04
 
 ### Usage
 The "searchbench" execution expects one argument, a tsv file of
@@ -48,7 +49,8 @@ DatasetSize Distribution  Parameter SearchAlgorithm RecordSizeBytes #threads
 2000        uniform       42        bs              8               1
 2000        uniform       42        sip             8               1
 ```
-"searchbench" runs each experiment and reports the time required to search each subset of 1000 records.
+"searchbench" runs each experiment and reports the time required to search each 
+subset of 1000 records, in nanosecods.
 ```bash
 $ ./searchbench experiments.tsv
 Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
@@ -98,9 +100,10 @@ A dataset is identified by its name and one parameter as described in the follow
 | cfal          | shape parameter (double)  |
 | file          | path of file              |
 
-When the dataset is "file" then the file identifued by "path of file" specifies all the keys that
-will be used in the dataset. The file should contain one key per line. Examples of dataaset file
-can be foundin src/datasets folder.
+When the dataset is "file" then the file identified by "path of file" specifies the keys that
+will be used in the dataset. When a dataset from a file is used the DatasetSize parameter
+does not affect the size of the dataset.The file should contain one key per line. 
+Examples of dataaset file can be foundin src/datasets folder.
 
 For explanation of the parameters and dataset please refer to our paper: ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
 Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf).
@@ -109,7 +112,7 @@ Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Se
 
 The algorithm we have implemented in our code are:
 
-| Dataset       | Parameter                      |
+| SearchAlgorithm       | Description                      |
 | ------------- |:-------------:                  |
 | is            | Interpolation Search            |
 | bs            | Binary Search                    |
@@ -122,4 +125,4 @@ If the searchbench is not producing output for an experiment the most propable c
 tab separated in the "experiment.tsv"
 
 ## Implementation
-Please consult the README in the src folder for more information on where each search method is implemented.
+Please consult the README in the src folder for more information on how the code is structured.
