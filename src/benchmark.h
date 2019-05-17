@@ -47,6 +47,7 @@ struct InputBase {
   static InputMap load(std::vector<Run> runs);
 };
 
+// Parse and create the datasets, generate the keys or import from file.
 template <int record_bytes> struct Input : public InputBase {
 private:
   auto uniform(long seed) {
@@ -117,11 +118,12 @@ public:
         const std::vector<std::string> &params)
       : permuted_keys(n), keys(n) {
     auto param = params.begin();
-    // uniform - seed
-    // gap    - seed, range
-    // FB      - file
-    // fal     - shape
-    // cfal    - shape
+    // datasetname - parameter
+    // uniform     - random gen seed
+    // gap         - random gen seed,gap parameter
+    // file        - path
+    // fal         - shape
+    // cfal        - shape
     if (distribution == "uniform") {
       auto seed = parse<long>(param[0]);
       fill(uniform(seed));
@@ -241,7 +243,7 @@ struct Run {
           thread_ns[sample_index] = ns_elapsed / sample_size;
       }
 #pragma omp critical
-      run.ok = run.ok && valSum == inputC.sum;
+      run.ok = run.ok && valSum == inputC.sum; // Verify correct results.
     }
     return ns;
   }
@@ -319,8 +321,10 @@ struct Run {
     default:
       assert(!"record not supported");
     }
+    // If not ok then execution failed, due to wrong results of
+    // the search algorithm.
     if (!this->ok)
-      std::cerr << "mess up " << param << ' ' << this->name << '\n';
+      std::cerr << "Execution failed" << param << ' ' << this->name << '\n';
     return ns;
   }
 };

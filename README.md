@@ -9,6 +9,8 @@ We have implemented various search methods and a benchmarking framework that
 measures the performance of these methods. We measure the time to search for a
 record of a dataset. Each record consists of a key and a payload, the keys are 
 8 Byte integers but the payloads can be varied across datasets.
+The benchmarking framework checks the results that are returned from each 
+search algorithm are correct.
 
 Using the benchmark framework we can easily control the following parameters:
 + size of the dataset  
@@ -19,7 +21,8 @@ Using the benchmark framework we can easily control the following parameters:
     (Interpolation Search, SIP, TIP, Binary Search, ...)  
 + record size  
     (each record contains an 8 Byte Key and a Payload, the record size parameter
-     specifies the size of the entire record)
+     specifies the size of the entire record) 
+     Valid options : 8, 32, 128
 + number of threads, the search for a single record is handled by one thread.
 
 ## Performance Evaluation
