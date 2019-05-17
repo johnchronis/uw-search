@@ -121,7 +121,7 @@ The algorithm we have implemented in our code are:
 
 
 ### Note
-If the searchbench is not producing output for an experiment the most propable cause it that a parameter is not
+If the searchbench is not producing output for an experiment the most probable cause it that a parameter is not
 tab separated in the "experiment.tsv"
 
 ## Implementation
