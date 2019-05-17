@@ -1,7 +1,8 @@
 ## Efficiently Searching In MemorySorted Arrays
 This repo hosts the code used in the paper   
 ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
-Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf) to be presented at ACM SIGMOD 2019.
+Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf)
+ to be presented at ACM SIGMOD 2019.
 
 ## Introduction
 We have implemented various search methods and a benchmarking framework that
@@ -50,7 +51,7 @@ DatasetSize Distribution  Parameter SearchAlgorithm RecordSizeBytes #threads
 2000        uniform       42        sip             8               1
 ```
 "searchbench" runs each experiment and reports the time required to search each 
-subset of 1000 records, in nanosecods.
+subset of 1000 records, in nanoseconds.
 ```bash
 $ ./searchbench experiments.tsv
 Loading Dataset size:2000, distribution: uniform, distribution parameter: 42
@@ -83,7 +84,7 @@ Run  DatasetSize  Distribution  Parameter  #threads  SearchAlgorithm  RecordSize
 
 
 ### TSV format
-The exeperiment tsv should include the following header:
+The experiment tsv should include the following header:
 ```bash
 DatasetSize	Distribution	Parameter	SearchAlgorithm	RecordSizeBytes	#threads
 ```
@@ -103,9 +104,10 @@ A dataset is identified by its name and one parameter as described in the follow
 When the dataset is "file" then the file identified by "path of file" specifies the keys that
 will be used in the dataset. When a dataset from a file is used the DatasetSize parameter
 does not affect the size of the dataset.The file should contain one key per line. 
-Examples of dataaset file can be foundin src/datasets folder.
+Examples of dataset file can be found in the src/datasets folder.
 
-For explanation of the parameters and dataset please refer to our paper: ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
+For explanation of the parameters and dataset please refer to our paper:
+["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
 Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf).
 
 ### Algorithms
