@@ -1,7 +1,7 @@
 ## Efficiently Searching In MemorySorted Arrays
 This repo hosts the code used in the paper   
 ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
-Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf) published at ACM SIGMOD 2019.
+Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf) to be presented at ACM SIGMOD 2019.
 
 ## Introduction
 We have implemented various search methods and a benchmarking framework that
