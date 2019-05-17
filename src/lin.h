@@ -4,7 +4,6 @@
 #include "padded_vector.h"
 #include "util.h"
 #include <x86intrin.h>
-//#include <iacaMarks.h>
 
 template <class Vector, int n = 8> class LinearUnroll {
   template <bool reverse = false>

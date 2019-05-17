@@ -14,13 +14,6 @@
 #include <tuple>
 #include <vector>
 
-#if IACA == 1
-#include <iacaMarks.h>
-#else
-#define IACA_START
-#define IACA_END
-#endif
-
 // The base for all interpolation based search algorithms.
 // Implements the interpolation functions used in the search algorithms.
 template <int record_bytes> class IBase {
@@ -162,11 +155,9 @@ public:
         }
         if (next_2 + guard_off >= right) {
           auto r = A[Linear::reverse(A, right, x)];
-          IACA_END
           return r;
         } else if (next_2 - guard_off <= left) {
           auto r = A[Linear::forward(A, left, x)];
-          IACA_END
           return r;
         }
       }
@@ -208,7 +199,6 @@ public:
     assert(A.size() >= 1);
     Index left = 0, right = A.size() - 1, next = interpolate(x);
     for (int i = 1; nIter < 0 ? true : i < nIter; i++) {
-      IACA_START
       if (A[next] < x)
         left = next + 1;
       else if (A[next] > x)
@@ -230,11 +220,9 @@ public:
 
       if (guard_off >= 0 && next + guard_off >= right) {
         auto r = A[Linear::reverse(A, right, x)];
-        IACA_END
         return r;
       } else if (guard_off >= 0 && next - guard_off <= left) {
         auto r = A[Linear::forward(A, left, x)];
-        IACA_END
         return r;
       }
       assert(next >= left);
@@ -280,7 +268,6 @@ public:
         right = next - 1;
       else
         return A[next];
-      IACA_END
       if (left == right)
         return A[left];
 
