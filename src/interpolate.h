@@ -25,6 +25,8 @@ public:
   static constexpr bool Precompute = true;
   static constexpr bool Intercept = true;
 
+  // Liner interpolation function using floating point arithmetic.
+  // appx flag controls if fixed point arithmetic is used.
   template <bool appx = true> struct Float {
     Float(const Vector &a)
         : A(a), slope(FixedPoint::Gen(A.size() - 1) / (A.back() - A[0])),
@@ -54,8 +56,26 @@ public:
     }
   };
 
-  template <bool t = false, bool appx = false> struct Hyp3 {
-    Hyp3(const Vector &a)
+  // Linear interpolation function that uses interger arithmetic.
+  struct IntDiv {
+    IntDiv(const Vector &a)
+        : A(a), i_range_width((A.back() - A[0]) / ((uint64_t)A.size() - 1)) {}
+
+    const Vector &A;
+    Key i_range_width;
+
+    Index operator()(const Key x, const Index left, const Index right) {
+      return left + (x - A[left]) / ((A[right] - A[left]) / (right - left));
+    }
+    Index operator()(const Key x, const Index mid) {
+      return mid + (x - A[mid]) / i_range_width;
+    }
+    Index operator()(const Key x) { return (x - A[0]) / i_range_width; }
+  };
+
+  // Three point interpolation function.
+  template <bool t = false, bool appx = false> struct ThreePointInterpolation {
+    ThreePointInterpolation (const Vector &a)
         : A(a), d((uint64_t)A.size() >> 1), y_1(A[d]), diff_y_01(A[0] - y_1),
           a_0(diff_y_01 == (y_1 - A.back())
                   ? 0.99999999999999
@@ -65,8 +85,9 @@ public:
     const Index d;
     const Key y_1;
     const double diff_y_01, a_0, diff_scale, d_a;
+    // The same function implemented in python.
     /*
-     * def hyp3(points, y_star):
+     * def ThreePointInterpolation(points, y_star):
          x, y = zip(*[(x, y - y_star) for x, y in points])
          error = (x[1] - x[2]) * (x[1] - x[0]) * y[1] * (y[2] - y[0]) / (
              (x[1] - x[2]) * (y[0] - y[1]) * y[2] + (x[1] - x[0]) * (y[1] -
@@ -87,103 +108,24 @@ public:
     }
   };
 
-  struct IntDiv {
-    IntDiv(const Vector &a)
-        : A(a), i_range_width((A.back() - A[0]) / ((uint64_t)A.size() - 1)) {}
-
-    const Vector &A;
-    Key i_range_width;
-
-    Index operator()(const Key x, const Index left, const Index right) {
-      return left + (x - A[left]) / ((A[right] - A[left]) / (right - left));
-    }
-    Index operator()(const Key x, const Index mid) {
-      return mid + (x - A[mid]) / i_range_width;
-    }
-    Index operator()(const Key x) { return (x - A[0]) / i_range_width; }
-  };
-
 protected:
+  // The array to search.
   const Vector &A;
+
 
   IBase(const Vector &v) : A(v) {}
 };
 
-// TIP
-template <int record_bytes, int guard_off,
-          class Interpolate = typename IBase<record_bytes>::template Hyp3<>>
-class tip : public IBase<record_bytes> {
-  using Super = IBase<record_bytes>;
-  using Vector = typename Super::Vector;
-  using typename Super::Index;
-  using Super::A;
-  using Linear = LinearUnroll<Vector>;
-  static constexpr int nIter = Super::Recurse;
-  static constexpr bool min_width = false;
+// Implementation of the search algoritms.
+// The templates control the size of the record to search, the interpolation
+// function to use and the size of the guard.
 
-  Interpolate interpolate;
-
-  __attribute__((always_inline)) Key linear_search(const Key x, Index y) const {
-    if (A[y] >= x) {
-      return A[Linear::reverse(A, y, x)];
-    } else {
-      return A[Linear::forward(A, y + 1, x)];
-    }
-  }
-
-public:
-  tip(const Vector &v) : Super(v), interpolate(A) { assert(A.size() >= 1); }
-
-  __attribute__((always_inline)) Key operator()(const Key x) {
-    Index left = 0, right = A.size() - 1, next_1 = A.size() >> 1,
-          next_2 = interpolate(x);
-    for (int i = 1; nIter < 0 || i < nIter; i++) {
-      if (next_2 - next_1 <= guard_off && next_2 - next_1 >= -guard_off)
-        return linear_search(x, next_2);
-      assert(next_1 >= left);
-      assert(next_1 <= right);
-      assert(next_2 >= left);
-      assert(next_2 <= right);
-      assert(next_1 != next_2);
-      if (A[next_1] != A[next_2]) {
-        if (next_1 < next_2) {
-          assert(A[next_1] <= x); // f(x) <= f(x') ==> x <= x'
-          left = next_1;
-        } else {
-          assert(A[next_1] >= x); // f(x) >= f(x') ==> x >= x'
-          right = next_1;
-        }
-        if (next_2 + guard_off >= right) {
-          auto r = A[Linear::reverse(A, right, x)];
-          return r;
-        } else if (next_2 - guard_off <= left) {
-          auto r = A[Linear::forward(A, left, x)];
-          return r;
-        }
-      }
-      next_1 = next_2;
-
-      assert(left < right);
-      assert(left >= 0);
-      assert(right < A.size());
-      assert(next_1 != left);
-      assert(next_1 != right);
-
-      next_2 = interpolate(x, left, next_1, right);
-
-      assert(next_2 >= left);
-      assert(next_2 <= right);
-    }
-    return linear_search(x, next_2);
-  }
-};
-
-// IS
+// Interpolation Seach - IS
 template <int record_bytes,
           class Interpolate = typename IBase<record_bytes>::template Float<>,
           int nIter = IBase<record_bytes>::Recurse, int guard_off = 16,
           bool min_width = false>
-class Interpolation : public IBase<record_bytes> {
+class InterpolationSearch : public IBase<record_bytes> {
   using Super = IBase<record_bytes>;
   using Vector = typename Super::Vector;
   using typename Super::Index;
@@ -193,7 +135,7 @@ class Interpolation : public IBase<record_bytes> {
   Interpolate interpolate;
 
 public:
-  Interpolation(const Vector &v) : Super(v), interpolate(A) {}
+  InterpolationSearch(const Vector &v) : Super(v), interpolate(A) {}
 
   __attribute__((always_inline)) Key operator()(const Key x) {
     assert(A.size() >= 1);
@@ -237,11 +179,11 @@ public:
   }
 };
 
-// SIP
+// Slope-reuse Interpolation Search - SIP
 template <int record_bytes, int nIter = IBase<record_bytes>::Recurse,
           class Interpolate = typename IBase<record_bytes>::template Float<>,
           int guard_off = 8>
-class InterpolationSlope : public IBase<record_bytes> {
+class SIPSearch : public IBase<record_bytes> {
   using Super = IBase<record_bytes>;
   using Vector = typename Super::Vector;
   using typename Super::Index;
@@ -252,7 +194,7 @@ class InterpolationSlope : public IBase<record_bytes> {
   Interpolate interpolate;
 
 public:
-  InterpolationSlope(const Vector &v) : Super(v), interpolate(A) {}
+  SIPSearch(const Vector &v) : Super(v), interpolate(A) {}
 
   // TODO replace with flatten?
   __attribute__((always_inline)) Key operator()(const Key x) {
@@ -302,6 +244,75 @@ public:
   }
 };
 
+// Three Point Interpolation Search - TIP Search
+template <int record_bytes, int guard_off,
+    class Interpolate = typename IBase<record_bytes>::template ThreePointInterpolation<>>
+class TIPSearch : public IBase<record_bytes> {
+  using Super = IBase<record_bytes>;
+  using Vector = typename Super::Vector;
+  using typename Super::Index;
+  using Super::A;
+  using Linear = LinearUnroll<Vector>;
+  static constexpr int nIter = Super::Recurse;
+  static constexpr bool min_width = false;
+
+  Interpolate interpolate;
+
+  __attribute__((always_inline)) Key linear_search(const Key x, Index y) const {
+    if (A[y] >= x) {
+      return A[Linear::reverse(A, y, x)];
+    } else {
+      return A[Linear::forward(A, y + 1, x)];
+    }
+  }
+
+ public:
+  TIPSearch(const Vector &v) : Super(v), interpolate(A) { assert(A.size() >= 1); }
+
+  __attribute__((always_inline)) Key operator()(const Key x) {
+    Index left = 0, right = A.size() - 1, next_1 = A.size() >> 1,
+        next_2 = interpolate(x);
+    for (int i = 1; nIter < 0 || i < nIter; i++) {
+      if (next_2 - next_1 <= guard_off && next_2 - next_1 >= -guard_off)
+        return linear_search(x, next_2);
+      assert(next_1 >= left);
+      assert(next_1 <= right);
+      assert(next_2 >= left);
+      assert(next_2 <= right);
+      assert(next_1 != next_2);
+      if (A[next_1] != A[next_2]) {
+        if (next_1 < next_2) {
+          assert(A[next_1] <= x); // f(x) <= f(x') ==> x <= x'
+          left = next_1;
+        } else {
+          assert(A[next_1] >= x); // f(x) >= f(x') ==> x >= x'
+          right = next_1;
+        }
+        if (next_2 + guard_off >= right) {
+          auto r = A[Linear::reverse(A, right, x)];
+          return r;
+        } else if (next_2 - guard_off <= left) {
+          auto r = A[Linear::forward(A, left, x)];
+          return r;
+        }
+      }
+      next_1 = next_2;
+
+      assert(left < right);
+      assert(left >= 0);
+      assert(right < A.size());
+      assert(next_1 != left);
+      assert(next_1 != right);
+
+      next_2 = interpolate(x, left, next_1, right);
+
+      assert(next_2 >= left);
+      assert(next_2 <= right);
+    }
+    return linear_search(x, next_2);
+  }
+};
+
 /*
  * is : Vanilla Interpolation Search
  * sip : SIP
@@ -312,27 +323,30 @@ public:
  * sip_idiv : use int division
  */
 template <int record_bytes>
-using is = Interpolation<record_bytes,
+using is = InterpolationSearch<record_bytes,
                          typename IBase<record_bytes>::template Float<false>,
                          IBase<record_bytes>::Recurse, -1>;
 template <int RECORD, int GUARD>
-using sip = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+using sip = SIPSearch<RECORD, IBase<RECORD>::Recurse,
                                typename IBase<RECORD>::template Float<>, GUARD>;
-template <int RECORD> using is_seq = InterpolationSlope<RECORD, 1>;
+template <int RECORD>
+using is_seq = SIPSearch<RECORD, 1>;
+
 template <int RECORD, int GUARD>
 using sip_no_reuse =
-    Interpolation<RECORD, typename IBase<RECORD>::template Float<>,
+  InterpolationSearch<RECORD, typename IBase<RECORD>::template Float<>,
                   IBase<RECORD>::Recurse, GUARD>;
 template <int RECORD>
 using sip_no_guard =
-    InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+  SIPSearch<RECORD, IBase<RECORD>::Recurse,
                        typename IBase<RECORD>::template Float<>, -1>;
 template <int RECORD>
 using sip_fp =
-    InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+  SIPSearch<RECORD, IBase<RECORD>::Recurse,
                        typename IBase<RECORD>::template Float<false>>;
+
 template <int RECORD>
-using sip_idiv = InterpolationSlope<RECORD, IBase<RECORD>::Recurse,
+using sip_idiv = SIPSearch<RECORD, IBase<RECORD>::Recurse,
                                     typename IBase<RECORD>::IntDiv>;
 
 #endif

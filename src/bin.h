@@ -10,6 +10,11 @@
 
 #include <limits>
 
+// Two implemetations of binary search, BinaryLR and Binary.
+// The two implementation mainly differ in how hey maintain the search interval
+// They template controls the records size to search similarly to the
+// IS, SIP, TIP but also BS specific parameters.
+
 template <int record_bytes = 8, bool RETURN_EARLY = true, bool TEST_EQ = true,
           bool FOR = false, int MIN_EQ_SZ = 1>
 class BinaryLR {
