@@ -247,7 +247,7 @@ public:
 // Three Point Interpolation Search - TIP Search
 template <int record_bytes, int guard_off,
     class Interpolate = typename IBase<record_bytes>::template ThreePointInterpolation<>>
-class TIPSearch : public IBase<record_bytes> {
+class tip : public IBase<record_bytes> {
   using Super = IBase<record_bytes>;
   using Vector = typename Super::Vector;
   using typename Super::Index;
@@ -267,7 +267,7 @@ class TIPSearch : public IBase<record_bytes> {
   }
 
  public:
-  TIPSearch(const Vector &v) : Super(v), interpolate(A) { assert(A.size() >= 1); }
+  tip(const Vector &v) : Super(v), interpolate(A) { assert(A.size() >= 1); }
 
   __attribute__((always_inline)) Key operator()(const Key x) {
     Index left = 0, right = A.size() - 1, next_1 = A.size() >> 1,
