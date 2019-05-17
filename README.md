@@ -1,5 +1,5 @@
 ## Efficiently Searching In MemorySorted Arrays
-This repo will host the code used in the paper 
+This repo hosts the code used in the paper 
 ["Efficiently Searching In-Memory Sorted Arrays:Revenge of the Interpolation 
 Search?"](http://pages.cs.wisc.edu/~jignesh/publ/Revenge_of_the_Interpolation_Search.pdf).
 
